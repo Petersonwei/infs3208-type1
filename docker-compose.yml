@@ -1,0 +1,68 @@
+version: "3.3"
+# services:
+#   mynginx:
+#     image: nginx:latest
+#     container_name: mynginx
+#     ports:
+#       - "8080:80"
+#     volumes:
+#       - ./src:/var/www/html
+#       - ./src/nginx.ini:/etc/nginx/conf.d/default.conf
+#     depends_on:
+#       - myphp
+#     networks:
+#       - mynet
+services:
+  mynginx:
+    image: nginx:latest
+    container_name: mynginx
+    ports:
+      - "8080:80"
+    volumes:
+      - ./src:/var/www/html
+      - ./src/nginx.ini:/etc/nginx/conf.d/default.conf
+
+  myphp:
+    build:
+      context: ./src/php
+    container_name: myphp
+    expose:
+      - "9000"
+    volumes:
+      - ./src:/var/www/html
+    depends_on:
+      - mysql
+      - myredis
+    networks:
+      - mynet
+
+  mysql:
+    image: mariadb:latest
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: MyDBRoot123
+      MYSQL_DATABASE: cloud_computing
+      MYSQL_USER: php
+      MYSQL_PASSWORD: php
+    networks:
+      - mynet
+
+  myredis:
+    image: redis:latest
+    container_name: myredis
+    networks:
+      - mynet
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: phpmyadmin
+    environment:
+      PMA_HOST: mysql
+    ports:
+      - "8082:80"
+    networks:
+      - mynet
+
+networks:
+  mynet:
+    driver: bridge
