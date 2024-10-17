@@ -24,7 +24,7 @@ spec:
           mountPath: /etc/nginx/conf.d/default.conf
           subPath: default.conf
       - name: php
-        image: php:8.2-fpm
+        image: your-dockerhub-username/php:latest
         ports:
         - containerPort: 9000
         volumeMounts:
@@ -48,9 +48,21 @@ spec:
       volumes:
       - name: html-volume
         hostPath:
-          # Ensure that this is the actual path to your HTML files on your local machine or Kubernetes node
-          path: C:\Dev\infs3208-type1\src
+          # Path to your project directory
+          path: /path/to/your/html/files
       - name: nginx-config-volume
         hostPath:
-          # Path to the nginx config file (nginx.ini or nginx.conf)
-          path: C:\Dev\infs3208-type1\srcnginx.ini
+          # Path to the nginx config file (nginx.ini)
+          path: /path/to/your/nginx.ini
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-nginx-service
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 80
+      targetPort: 80
+  selector:
+    app: my-app

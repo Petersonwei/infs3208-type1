@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myphp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: myphp
+  template:
+    metadata:
+      labels:
+        app: myphp
+    spec:
+      containers:
+      - name: php-fpm
+        image: php:8.2-fpm
+        ports:
+        - containerPort: 9000
+        volumeMounts:
+        - name: html-volume
+          mountPath: /var/www/html   # Mount the source code
+      volumes:
+      - name: html-volume
+        persistentVolumeClaim:
+          claimName: html-pvc        # Use Persistent Volume for HTML/PHP files
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: myphp
+spec:
+  ports:
+  - port: 9000
+  selector:
+    app: myphp
